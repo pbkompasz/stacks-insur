@@ -1,0 +1,6 @@
+[submodule "sbtc-starter"]
+	path = sbtc-starter
+	url = git@github.com:kenrogers/sbtc-starter.git
+[submodule "ai-agent-crew"]
+	path = ai-agent-crew
+	url = git@github.com:aibtcdev/ai-agent-crew.git
