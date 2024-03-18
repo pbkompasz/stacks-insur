@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  frontend-insurance:
+    build:
+      context: ./frontend-insurance
+      dockerfile: Dockerfile
+    ports:
+      - "3000:5173"
+    environment:
+      VITE_CREW_HREF: http://localhost:3001
+
+  frontend-crew:
+    build:
+      context: ./frontend-crew
+      dockerfile: Dockerfile
+    ports:
+      - "3001:5173"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    # volumes:
+    #   - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
