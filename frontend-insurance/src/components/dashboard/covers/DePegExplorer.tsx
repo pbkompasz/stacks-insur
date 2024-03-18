@@ -1,4 +1,4 @@
-import Explorer from "./Explorer.tsx";
+import Explorer from "../../reusable/Explorer.tsx";
 
 const DePegExplorer = () => {
   return <></>;
