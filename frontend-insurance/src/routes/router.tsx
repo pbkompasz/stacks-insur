@@ -9,6 +9,7 @@ import LandingLayout from "../components/landing/LandingLayout.tsx";
 import Landing from "../components/landing/Landing.tsx";
 import HowItWorks from "../components/landing/HowItWorks.tsx";
 import Products from "../components/landing/Products.tsx";
+import Exchange from "../components/dashboard/Exchange.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
       {
         path: "",
         element: <Dashboard />,
+      },
+      {
+        path: "exchange",
+        element: <Exchange />,
       },
       {
         path: "buy",
