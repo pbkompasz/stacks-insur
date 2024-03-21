@@ -1,4 +1,3 @@
-import * as React from "react";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -21,18 +20,17 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import Stack from "@mui/material/Stack";
+import GavelIcon from "@mui/icons-material/Gavel";
+import GroupsIcon from "@mui/icons-material/Groups";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  getAddress,
-  AddressPurpose,
-  BitcoinNetworkType,
-  Capability,
-  type GetAddressResponse,
-  getCapabilities,
-} from "sats-connect";
+import { showConnect } from "@stacks/connect";
 
-import { useLocalStorage } from "../../util/useLocalStorage";
+import { userSession } from "../../util/stacksInit.ts";
+import "../../App.scss";
 
 const drawerWidth = 240;
 
@@ -107,7 +105,13 @@ const Drawer = styled(MuiDrawer, {
 
 export default function MiniDrawer() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(false);
+  const [network, setNetwork] = useState("Testnet");
+  const [userData, setUserData] = useState({});
+
+  const toggleNetwork = () => {
+    setNetwork(network === "Testnet" ? "Mainnet" : "Testnet");
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -117,114 +121,30 @@ export default function MiniDrawer() {
     setOpen(false);
   };
 
-  const getAddressOptions = {
-    payload: {
-      purposes: ["ordinals", "payment"] as AddressPurpose[],
-      message: "Address for receiving Ordinals and payments",
-      network: {
-        type: "Mainnet" as BitcoinNetworkType,
-      },
-    },
-    onFinish: (response: GetAddressResponse) => {
-      console.log(response);
-      const paymentAddressItem = response.addresses.find(
-        (address) => address.purpose === AddressPurpose.Payment
-      );
-      setPaymentAddress(paymentAddressItem?.address);
-      setPaymentPublicKey(paymentAddressItem?.publicKey);
-
-      const ordinalsAddressItem = response.addresses.find(
-        (address) => address.purpose === AddressPurpose.Ordinals
-      );
-      setOrdinalsAddress(ordinalsAddressItem?.address);
-      setOrdinalsPublicKey(ordinalsAddressItem?.publicKey);
-
-      const stacksAddressItem = response.addresses.find(
-        (address) => address.purpose === AddressPurpose.Stacks
-      );
-      setStacksAddress(stacksAddressItem?.address);
-      setStacksPublicKey(stacksAddressItem?.publicKey);
-    },
-    onCancel: () => alert("Request canceled"),
-  };
-
-  const [paymentAddress, setPaymentAddress] = useLocalStorage("paymentAddress");
-  const [paymentPublicKey, setPaymentPublicKey] =
-    useLocalStorage("paymentPublicKey");
-  const [ordinalsAddress, setOrdinalsAddress] =
-    useLocalStorage("ordinalsAddress");
-  const [ordinalsPublicKey, setOrdinalsPublicKey] =
-    useLocalStorage("ordinalsPublicKey");
-  const [stacksAddress, setStacksAddress] = useLocalStorage("stacksAddress");
-  const [stacksPublicKey, setStacksPublicKey] =
-    useLocalStorage("stacksPublicKey");
-  const [network, setNetwork] = useLocalStorage<BitcoinNetworkType>(
-    "network",
-    BitcoinNetworkType.Testnet
-  );
-  const [capabilityState, setCapabilityState] = useState<
-    "loading" | "loaded" | "missing" | "cancelled"
-  >("loading");
-  const [capabilities, setCapabilities] = useState<Set<Capability>>();
-
-  const isReady =
-    !!paymentAddress &&
-    !!paymentPublicKey &&
-    !!ordinalsAddress &&
-    // TODO
-    !!ordinalsPublicKey; //&& !!stacksAddress;
-
-  const onWalletDisconnect = () => {
-    setPaymentAddress(undefined);
-    setPaymentPublicKey(undefined);
-    setOrdinalsAddress(undefined);
-    setOrdinalsPublicKey(undefined);
-    setStacksAddress(undefined);
-  };
-
   useEffect(() => {
-    const runCapabilityCheck = async () => {
-      let runs = 0;
-      const MAX_RUNS = 20;
-      setCapabilityState("loading");
+    if (userSession.isUserSignedIn()) {
+      setUserData(userSession.loadUserData());
+      console.log(userSession.loadUserData());
+    }
+  }, []);
 
-      // the wallet's in-page script may not be loaded yet, so we'll try a few times
-      while (runs < MAX_RUNS) {
-        try {
-          await getCapabilities({
-            onFinish(response) {
-              setCapabilities(new Set(response));
-              setCapabilityState("loaded");
-            },
-            onCancel() {
-              setCapabilityState("cancelled");
-            },
-            payload: {
-              network: {
-                type: network,
-              },
-            },
-          });
-        } catch (e) {
-          runs++;
-          if (runs === MAX_RUNS) {
-            setCapabilityState("missing");
-          }
-        }
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    };
+  const myAppName = "My Stacks Web-App";
+  const myAppIcon = window.location.origin + "/my_logo.png";
 
-    runCapabilityCheck();
-  }, [network]);
-
-  const toggleNetwork = () => {
-    setNetwork(
-      network === BitcoinNetworkType.Testnet
-        ? BitcoinNetworkType.Mainnet
-        : BitcoinNetworkType.Testnet
-    );
-    onWalletDisconnect();
+  const connect = () => {
+    showConnect({
+      userSession,
+      appDetails: {
+        name: myAppName,
+        icon: myAppIcon,
+      },
+      onFinish: (resp) => {
+        console.log(resp);
+      },
+      onCancel: () => {
+        console.log("cancelled");
+      },
+    });
   };
 
   return (
@@ -244,23 +164,14 @@ export default function MiniDrawer() {
           >
             <MenuIcon />
           </IconButton>
-          <Box padding={1} mr="auto">
-            Selected network: {network}
-            <Tooltip title="Switch Network">
-              <Button variant="text" onClick={toggleNetwork} color="secondary">
-                {network === "Mainnet" ? (
-                  <SwitchLeftIcon></SwitchLeftIcon>
-                ) : (
-                  <SwitchRightIcon></SwitchRightIcon>
-                )}
-              </Button>
-            </Tooltip>
-          </Box>
-          {!isReady ? (
+          <ShoppingCartIcon
+            style={{ marginLeft: "auto", marginRight: "1rem" }}
+          ></ShoppingCartIcon>
+          {!userSession.isUserSignedIn() ? (
             <Button
               variant="outlined"
               color="secondary"
-              onClick={() => getAddress(getAddressOptions)}
+              onClick={() => connect()}
             >
               Connect your wallet
             </Button>
@@ -269,7 +180,7 @@ export default function MiniDrawer() {
               <Button
                 color="secondary"
                 variant="outlined"
-                onClick={() => onWalletDisconnect()}
+                onClick={() => userSession.signUserOut()}
               >
                 Disconnect
               </Button>
@@ -291,18 +202,27 @@ export default function MiniDrawer() {
         <List>
           {[
             {
+              name: "Exchange",
+              href: "/dashboard/exchange",
+              icon: (
+                <CurrencyExchangeIcon fontSize="small"></CurrencyExchangeIcon>
+              ),
+            },
+            {
               name: "Covers",
               href: "/dashboard/buy",
+              icon: <GavelIcon fontSize="small"></GavelIcon>,
             },
             {
               name: "Claims",
               href: "/dashboard/claim",
+              icon: <ReceiptIcon fontSize="small"></ReceiptIcon>,
             },
             {
               name: "The Crew",
               external: true,
               href: import.meta.env.VITE_CREW_HREF,
-              target: "_blank",
+              icon: <GroupsIcon fontSize="small"></GroupsIcon>,
             },
           ].map((menuItem) => (
             <ListItem
@@ -317,6 +237,7 @@ export default function MiniDrawer() {
                   px: 2.5,
                 }}
                 href={menuItem.href}
+                target={menuItem.external ? "_blank" : ""}
               >
                 <ListItemIcon
                   sx={{
@@ -325,7 +246,7 @@ export default function MiniDrawer() {
                     justifyContent: "center",
                   }}
                 >
-                  <OpenInNewIcon fontSize="small"></OpenInNewIcon>
+                  {menuItem.icon}
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }}>
                   <Stack direction="row" alignItems="center" gap={0.25}>
@@ -339,6 +260,69 @@ export default function MiniDrawer() {
             </ListItem>
           ))}
         </List>
+        {/* TODO */}
+        {open && (
+          <Box paddingX={1} mt="auto">
+            Selected network: {network}
+            <Tooltip title="Switch Network">
+              <Button variant="text" onClick={toggleNetwork} color="secondary">
+                {network === "Mainnet" ? (
+                  <SwitchLeftIcon></SwitchLeftIcon>
+                ) : (
+                  <SwitchRightIcon></SwitchRightIcon>
+                )}
+              </Button>
+            </Tooltip>
+          </Box>
+        )}
+        {userSession.isUserSignedIn() && open && (
+          <div
+            style={{
+              padding: "1rem",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "240px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              Identity Address:
+              <Tooltip
+                placement="top-start"
+                title={userData.identityAddress}
+                style={{ textDecoration: "underline" }}
+              >
+                {userData.identityAddress}
+              </Tooltip>
+            </div>
+            <div>
+              <div>STX/BTC Address:</div>
+              <Stack direction="row" gap={0.25}>
+                <div style={{ maxWidth: "100px", overflow: "hidden" }}>
+                  <Tooltip
+                    placement="top-start"
+                    title={userData.profile?.stxAddress?.testnet}
+                    style={{ textDecoration: "underline" }}
+                  >
+                    {userData.profile?.stxAddress.testnet}
+                  </Tooltip>
+                </div>
+                /
+                <div style={{ maxWidth: "100px", overflow: "hidden" }}>
+                  <Tooltip
+                    placement="top-start"
+                    title={userData.profile?.btcAddress}
+                    style={{ textDecoration: "underline" }}
+                  >
+                    {userData.profile?.btcAddress}
+                  </Tooltip>
+                </div>
+              </Stack>
+            </div>
+          </div>
+        )}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
