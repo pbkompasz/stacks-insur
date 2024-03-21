@@ -1,0 +1,9 @@
+{
+  "prompts": [
+    {
+      "name": "Check sourcecode",
+      "prompt": "Go through the source code in a BFS manner and check for code quality, presence comments and understandability",
+      "response": "rating"
+    }
+  ]
+}

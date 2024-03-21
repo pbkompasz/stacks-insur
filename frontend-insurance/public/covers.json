@@ -1,0 +1,121 @@
+{
+  "smart-contracts": [
+    {
+      "name": "Uniswap V2",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+    {
+      "name": "1inch",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+
+    {
+      "name": "Yearn Finance",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+
+    {
+      "name": "Aave v2",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    }
+  ],
+  "de-peg": [
+    {
+      "name": "Arkadiko",
+      "token": "USDA",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+    {
+      "name": "UWU Protocol",
+      "token": "UWU",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+    {
+      "name": "Dollar on Chain",
+      "token": "DoC",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+    {
+      "name": "USDC",
+      "token": "USDC",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    },
+    {
+      "name": "Tether USDt",
+      "token": "USDT",
+      "premium": {
+        "daily": null,
+        "weekly": null,
+        "monthly": null,
+        "quarterly": null,
+        "yearly": null
+      },
+      "capacity": null,
+      "rating": null
+    }
+  ]
+}
