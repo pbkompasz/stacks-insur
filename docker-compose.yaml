@@ -8,6 +8,10 @@ services:
       - "3000:5173"
     environment:
       VITE_CREW_HREF: http://localhost:3001
+      VITE_BACKEND_BASE: http://localhost:4000
+    volumes:
+      - "./frontend-insurance/src:/app/src"
+      - "./frontend-insurance/public:/app/public"
 
   frontend-crew:
     build:
@@ -15,6 +19,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:5173"
+    environment:
+      VITE_BACKEND_BASE: http://localhost:4000
+    volumes:
+      - "./frontend-crew/src:/app/src"
+
 
   backend:
     build:
@@ -35,5 +44,5 @@ services:
       POSTGRES_PASSWORD: mypassword
     ports:
       - "5432:5432"
-    # volumes:
-    #   - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
