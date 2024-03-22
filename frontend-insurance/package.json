@@ -19,6 +19,7 @@
     "@stacks/connect": "^7.7.1",
     "@stacks/profile": "^6.12.1",
     "@stacks/transactions": "^6.12.1",
+    "axios": "^1.6.8",
     "node-sass": "^9.0.0",
     "react": "^18.2.0",
     "react-cookie": "^7.1.0",
