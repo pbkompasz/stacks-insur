@@ -10,6 +10,7 @@ import Landing from "../components/landing/Landing.tsx";
 import HowItWorks from "../components/landing/HowItWorks.tsx";
 import Products from "../components/landing/Products.tsx";
 import Exchange from "../components/dashboard/Exchange.tsx";
+import Checkout from "../components/dashboard/Checkout.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
       {
         path: "claim",
         element: <Claims />,
+      },
+      {
+        path: "checkout",
+        element: <Checkout />,
       },
     ],
   },
