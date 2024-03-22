@@ -25,6 +25,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Link from "@mui/material/Link";
 import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { showConnect } from "@stacks/connect";
@@ -164,9 +165,13 @@ export default function MiniDrawer() {
           >
             <MenuIcon />
           </IconButton>
-          <ShoppingCartIcon
-            style={{ marginLeft: "auto", marginRight: "1rem" }}
-          ></ShoppingCartIcon>
+          <Link
+            href="/dashboard/checkout"
+            color="rgb(256, 256, 256)"
+            style={{ margin: "auto 1rem auto auto" }}
+          >
+            <ShoppingCartIcon></ShoppingCartIcon>
+          </Link>
           {!userSession.isUserSignedIn() ? (
             <Button
               variant="outlined"
