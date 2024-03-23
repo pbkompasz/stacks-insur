@@ -19,7 +19,7 @@
 (define-constant ERR_OWNER_ONLY  (err u100))
 (define-constant ERR_NOT_TOKEN_OWNER  (err u100))
 
-(define-constant CONTRACT_OWNER  tx-sender)
+(define-constant CONTRACT_OWNER  (as-contract tx-sender))
 (define-constant TOKEN_URI u"https://clarity-lang.org")
 (define-constant TOKEN_NAME  "DeIns Mutual")
 (define-constant TOKEN_SYMBOL  "DIM")
@@ -47,8 +47,15 @@
 
 (define-public (mint (amount uint) (recipient principal)) 
   (begin 
-    (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_OWNER_ONLY) 
+    ;; (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_OWNER_ONLY) 
     (ft-mint? deins-mutual amount recipient)
+  )
+)
+
+(define-public (burn (amount uint) (recipient principal)) 
+  (begin 
+    ;; (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_OWNER_ONLY) 
+    (ft-burn? deins-mutual amount recipient)
   )
 )
 
