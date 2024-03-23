@@ -1,18 +1,18 @@
 ---
 id: 0
-name: Devnet deployment
-network: devnet
-stacks-node: "http://localhost:20443"
-bitcoin-node: "http://devnet:devnet@localhost:18443"
+name: Testnet deployment
+network: testnet
+stacks-node: "https://api.testnet.hiro.so"
+bitcoin-node: "http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332"
 plan:
   batches:
     - id: 0
       transactions:
         - requirement-publish:
             contract-id: SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard
-            remap-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            remap-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
             remap-principals:
-              SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+              SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
             cost: 8400
             path: "./.cache/requirements/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.clar"
             clarity-version: 1
@@ -21,22 +21,22 @@ plan:
       transactions:
         - contract-publish:
             contract-name: token
-            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 16450
+            expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
+            cost: 491298
             path: contracts/token.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: amm
-            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 32470
+            expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
+            cost: 491539
             path: contracts/amm.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: cover
-            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 8190
+            expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
+            cost: 491178
             path: contracts/cover.clar
             anchor-block-only: true
             clarity-version: 2
