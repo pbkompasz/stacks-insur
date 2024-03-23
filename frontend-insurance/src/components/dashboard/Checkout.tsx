@@ -8,11 +8,13 @@ import {
   useEffect,
   useState,
 } from "react";
+import { StacksTestnet } from "@stacks/network";
 import { useLocalStorage } from "../../util/useLocalStorage";
+import { uintCV, stringAsciiCV } from "@stacks/transactions";
+import { openContractCall } from "@stacks/connect";
 
 type CartItem = {
   type: string;
-
   name: string;
   coveredAssetId: string;
   coveredAmount: string | number;
@@ -60,8 +62,31 @@ const Checkout = () => {
     }
   }, [isOver]);
 
-  const pay = () => {
-    setCart(JSON.stringify([]));
+  const pay = async () => {
+    const functionArgs = [
+      stringAsciiCV((cart ? JSON.parse(cart) : [])[0].name),
+      uintCV(totalAmount),
+      uintCV((cart ? JSON.parse(cart) : [])[0].duration), 
+    ];
+
+    const options = {
+      // contractAddress: import.meta.env.VITE_AMM_CONTRACT,
+      contractAddress: "ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT",
+      contractName: "amm",
+      functionName: "buy_cover",
+      functionArgs,
+      network: new StacksTestnet(),
+      appDetails: {
+        name: "DeIns Mutual",
+        icon: window.location.origin + "/my-app-logo.svg",
+      },
+      onFinish: (data: string) => {
+        console.log(data);
+        setCart(JSON.stringify([]));
+      },
+    };
+    // @ts-expect-error Sponsored should be optional
+    await openContractCall(options);
   };
 
   return (
