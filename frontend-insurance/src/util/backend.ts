@@ -16,4 +16,19 @@ const fetchCovers = async (
   }
 };
 
-export { client, fetchCovers };
+const fetchClaims = async (
+  userId: string,
+) => {
+  try {
+    let claims = '/claims'
+    if (userId) {
+      claims += `?user_id=${userId}`;
+    }
+    const resp = await client.get(claims);
+    return resp.data.claims;
+  } catch (error) {
+    throw new Error('Wrong request');
+  }
+};
+
+export { client, fetchCovers, fetchClaims, };
