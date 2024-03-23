@@ -20,7 +20,7 @@
 (define-constant ERR_AMOUNT  (err u102))
 (define-constant ERR_LOW_DEPOSIT  (err u103))
 
-(define-constant CONTRACT_OWNER  tx-sender)
+(define-constant CONTRACT_OWNER  (as-contract tx-sender))
 
 (define-constant BUFFER_CONSTANT 10) 
 (define-constant MCR_CONSTANT 5) 
@@ -32,7 +32,7 @@
 ;; total_cover
 ;; per 100 STX
 (define-data-var price uint u4)
-(define-data-var total_cover int 0)
+(define-data-var total_cover uint u0)
 (define-data-var liquidity uint u0)
 ;; Minimal Capital Requirement
 ;; mcr = total_cover / MCR_CONSTANT
@@ -44,8 +44,6 @@
 (define-data-var virtual_target int 0)
 
 (define-data-var latest_rebalance_time uint u0)
-(define-data-var init_time uint u0)
-
 ;; data maps
 ;;
 
@@ -54,27 +52,13 @@
 ;; public functions
 ;;
 
-(define-public (init_mutual (initial_investment uint))
-  (begin
-    (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_OWNER_ONLY) 
-    (asserts! (is-eq u0 (var-get init_time)) ERR_REINIT)
-    (asserts! (> u0 initial_investment) ERR_AMOUNT)
-    (let ((block_time (default-to u0 (get-block-info? time u0))))
-      ;; WTF
-      ;; (if (is-eq block_time u0) (var-set init_time block_time) (err u0))
-      (var-set init_time block_time)
-    )
-    (ok true)
-  )
-)
-
 ;; Depositing STX
 (define-public (deposit (amount uint))
   (begin
     (asserts! (> amount u1000) ERR_AMOUNT)
     (map-set deposits tx-sender (+ (get_deposit tx-sender) amount))
     (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
-    (try! (contract-call? .token mint  (/ (* amount (var-get price)) u1000000) tx-sender))
+    (try! (contract-call? .token mint  (/ (* amount (var-get price)) u100) tx-sender))
     (var-set liquidity (+ (var-get liquidity) amount))
     (if (> (var-get latest_rebalance_time) REBALANCE_INTERVAL) (rebalance-pool) (ok true))
   )
@@ -83,15 +67,15 @@
 ;; Redeeming STX
 (define-public (redeem (amount uint))
   (begin
-    (asserts! (> amount u1000) ERR_AMOUNT)
+    (asserts! (> amount u0) ERR_AMOUNT)
     (let ((deposited_amount (get_deposit tx-sender))) 
       ;; WTF
       ;; (asserts! (> deposited_amount u0) (err ERR_LOW_DEPOSIT))
       (map-set deposits tx-sender (- deposited_amount amount))
     )
-    (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
-    (try! (contract-call? .token mint (/ (* amount (var-get price)) u1000000) tx-sender))
-    (var-set liquidity (+ (var-get liquidity) amount))
+    ;; (try! (stx-transfer? amount CONTRACT_OWNER tx-sender))
+    (try! (contract-call? .token burn (/ (* amount (var-get price)) u100) tx-sender))
+    (var-set liquidity (- (var-get liquidity) amount))
     (ok true)
   )
 )
