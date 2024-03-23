@@ -46,7 +46,7 @@ const Exchange = () => {
   const [originAmount, setOriginAmount] = useState(0);
   const [originToken, setOriginToken] = useState("STX");
   const [targetAmount, setTargetAmount] = useState(0);
-  const [targetToken, setTargetToken] = useState("TOKEN_NAME");
+  const [targetToken, setTargetToken] = useState("DIM");
 
   const updateAmount = (val: string) => {
     setOriginAmount(+val);
@@ -55,9 +55,9 @@ const Exchange = () => {
 
   const updateToken = (
     which: "origin" | "target",
-    val: "STX" | "TOKEN_NAME"
+    val: "STX" | "DIM"
   ) => {
-    const otherToken = val === "STX" ? "TOKEN_NAME" : "STX";
+    const otherToken = val === "STX" ? "DIM" : "STX";
     setOriginToken(which === "origin" ? val : otherToken);
     setTargetToken(which === "origin" ? otherToken : val);
     setOriginAmount(0);
@@ -67,14 +67,14 @@ const Exchange = () => {
   return (
     <>
       <Typography variant="h1" style={{ textAlign: "left", fontSize: "24px" }}>
-        Mint & Redeem TOKEN_NAME
+        Mint & Redeem DIM
       </Typography>
       <Paper
         variant="outlined"
         style={{ width: "600px", margin: "2rem auto", padding: "2rem" }}
       >
         <Stack alignItems="stretch" gap={2}>
-          <Typography>1 STX = {"tokenPrice"} TOKEN_NAME</Typography>
+          <Typography>1 STX = {"tokenPrice"} DIM</Typography>
           <Stack direction="row" justifyContent="space-between" gap={2}>
             <TextField
               id="outlined-number"
@@ -95,11 +95,11 @@ const Exchange = () => {
                 label="Token"
                 size="small"
                 onChange={(e) =>
-                  updateToken("origin", e.target.value as "STX" | "TOKEN_NAME")
+                  updateToken("origin", e.target.value as "STX" | "DIM")
                 }
               >
                 <MenuItem value="STX">STX</MenuItem>
-                <MenuItem value="TOKEN_NAME">TOKEN_NAME</MenuItem>
+                <MenuItem value="DIM">DIM</MenuItem>
               </Select>
             </FormControl>
           </Stack>
@@ -123,7 +123,7 @@ const Exchange = () => {
                 label="Token"
               >
                 <MenuItem value="STX">STX</MenuItem>
-                <MenuItem value="TOKEN_NAME">TOKEN_NAME</MenuItem>
+                <MenuItem value="DIM">DIM</MenuItem>
               </Select>
             </FormControl>
           </Stack>
