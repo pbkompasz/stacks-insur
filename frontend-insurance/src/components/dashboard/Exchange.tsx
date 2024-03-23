@@ -1,11 +1,6 @@
-import { openSTXTransfer } from "@stacks/connect";
+import { openContractCall } from "@stacks/connect";
 import { StacksTestnet } from "@stacks/network";
-import {
-  AnchorMode,
-  PostConditionMode,
-  StacksTransaction,
-} from "@stacks/transactions";
-import { userSession } from "../../util/stacksInit.ts";
+import { uintCV } from "@stacks/transactions";
 
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -17,26 +12,35 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import FormControl from "@mui/material/FormControl";
+// import BigNum from "bn.js";
 
 const Exchange = () => {
+  const [success, setSuccess] = useState();
+
   const send = async () => {
-    openSTXTransfer({
-      network: new StacksTestnet(), // which network to use; use `new StacksMainnet()` for mainnet
-      anchorMode: AnchorMode.Any, // which type of block the tx should be mined in
+    const functionArgs = [uintCV(originAmount * 1000000)];
 
-      recipient: "ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK", // which address we are sending to
-      amount: "10000", // tokens, denominated in micro-STX
-      memo: "Nr. 1337", // optional; a memo to help identify the tx
-
-      onFinish: (response) => {
-        // WHEN user confirms pop-up
-        console.log(response.txId); // the response includes the txid of the transaction
+    const options = {
+      // contractAddress: import.meta.env.VITE_AMM_CONTRACT,
+      contractAddress: "ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT",
+      contractName: "amm",
+      functionName: originToken === "STX" ? "deposit" : "redeem",
+      functionArgs,
+      network: new StacksTestnet(),
+      appDetails: {
+        name: "DeIns Mutual",
+        icon: window.location.origin + "/my-app-logo.svg",
+      },
+      onFinish: (data: string) => {
+        console.log(data);
+        setSuccess(true);
       },
       onCancel: () => {
-        // WHEN user cancels/closes pop-up
-        console.log("User canceled");
+        setSuccess(false);
       },
-    });
+    };
+    // @ts-expect-error Sponsored should be optional
+    await openContractCall(options);
   };
 
   const [originAmount, setOriginAmount] = useState(0);
@@ -126,6 +130,18 @@ const Exchange = () => {
           <Button onClick={send}>send</Button>
         </Stack>
       </Paper>
+      {success === true && (
+        <>
+          <Typography color="green">
+            Success! The tokens will appear in your account shortly.
+          </Typography>
+        </>
+      )}
+      {success === false && (
+        <>
+          <Typography color="red">Error! Please try again.</Typography>
+        </>
+      )}
     </>
   );
 };
