@@ -1,10 +1,9 @@
+type Claim = {
+  id: string;
+};
 
-const Claim = () => {
-  return(
-    <>
-       
-    </>
-  )
-}
+const Claim = ({ claim }: { claim: Claim }) => {
+  return <>{claim.id}</>;
+};
 
 export default Claim;
