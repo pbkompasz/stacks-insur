@@ -62,7 +62,7 @@
 ;; public functions
 ;;
 
-(define-public (create_cover (name (string-ascii 32)) (cover_type uint))
+(define-public (create-cover (name (string-ascii 32)) (cover_type uint))
   ;; TODO Check not created
   (begin 
     (asserts! (or (is-eq cover_type u0) (is-eq cover_type u1)) ERR_WRONG_COVER_TYPE)
@@ -79,10 +79,10 @@
   )
 )
 
-(define-public (update_cover (name (string-ascii 32)) (amount uint)) 
+(define-public (update-cover (name (string-ascii 32)) (amount uint)) 
   (begin
     (asserts! (> amount u0) ERR_AMOUNT)
-    (asserts! (is-none (map-get? covers name)) ERR_COVER_EXISTS)
+    (asserts! (not (is-none (map-get? covers name))) ERR_COVER_EXISTS)
     (map-set covers name {
       amount: amount,
       type: (get type (unwrap! (map-get? covers name) (err u1234))),
@@ -150,7 +150,7 @@
 )
 
 ;; A vote to start a vote to start a vote ...
-(define-public (vote_start_vote (cover_name (string-ascii 32)))
+(define-public (vote-start-vote (cover_name (string-ascii 32)))
   (begin
     (asserts! (not (is-none (map-get? covers cover_name))) ERR_NO_COVER)
     (unwrap! (map-get? tokens_staked {
@@ -172,17 +172,17 @@
 
 
 
-(define-public (get_cover_estimate (cover_name (string-ascii 32)) (amount uint))
+(define-public (get-cover-estimate (cover_name (string-ascii 32)) (amount uint))
   (ok (/ (* amount (get risk_factor (unwrap! (map-get? covers cover_name) (err u1234)))) u100))  
 )
 
 ;; in STX
-(define-public (buy_cover (cover_name (string-ascii 32)) (amount uint) (duration_days uint))
+(define-public (buy-cover (cover_name (string-ascii 32)) (amount uint) (duration_days uint))
   (begin 
     (asserts! (> amount u0) ERR_AMOUNT)
     (asserts! (> duration_days u10) ERR_DAYS)
     (asserts! (not (is-none (map-get? covers cover_name))) ERR_NO_COVER)
-    (let ((estimate (unwrap! (get_cover_estimate cover_name amount) (err u21432)))) 
+    (let ((estimate (unwrap! (get-cover-estimate cover_name amount) (err u21432)))) 
       ;; TODO
       ;; (asserts! (> (unwrap! (contract-call? .token get-balance tx-sender) (err u1234)) amount) (err u432))
       (try! (stx-transfer? estimate tx-sender (as-contract tx-sender)))
@@ -203,11 +203,11 @@
 
 ;; read only functions
 ;;
-(define-read-only (get_cover (name (string-ascii 32)))
+(define-read-only (get-cover (name (string-ascii 32)))
     (ok (map-get? covers name))
 )
 
-(define-read-only (get_cover_bought (name (string-ascii 32)))
+(define-read-only (get-cover-bought (name (string-ascii 32)))
     (ok
       (map-get? covers_bought {
         buyer: tx-sender,
@@ -215,12 +215,12 @@
       }))
 )
 
-(define-read-only (get_claims_active) (ok true))
+(define-read-only (get-claims-active) (ok true))
 
 ;; private functions
 ;;
 ;; TODO
-(define-private (payout_claims) 
+(define-private (payout-claims) 
   (begin
     (ok true)  
   )
@@ -250,9 +250,9 @@
 
 ;; For testing
 
-(define-private (buy_cover_test (cover_name (string-ascii 32)) (amount uint) (duration_days uint)) 
+(define-private (buy-cover-test (cover_name (string-ascii 32)) (amount uint) (duration_days uint)) 
   (begin 
-    (let ((estimate (unwrap! (get_cover_estimate cover_name amount) (err u21432)))) 
+    (let ((estimate (unwrap! (get-cover-estimate cover_name amount) (err u21432)))) 
       ;; TODO
       ;; (asserts! (> (unwrap! (contract-call? .token get-balance tx-sender) (err u1234)) amount) (err u432))
       ;; (ok estimate)
@@ -270,6 +270,6 @@
     (ok true)  
   )
 )
-(buy_cover_test "Uniswap V2" u100000 u30)
+(buy-cover-test "Uniswap V2" u100000 u30)
 
 

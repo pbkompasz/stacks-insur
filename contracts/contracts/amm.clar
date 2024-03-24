@@ -47,7 +47,7 @@
 (define-constant ERR_NOT_TOKEN_OWNER  (err u100))
 (define-constant ERR_NO_GET  (err u200))
 
-(define-constant CONTRACT_OWNER .amm)
+(define-constant CONTRACT_OWNER tx-sender)
 (define-constant TOKEN_URI u"https://clarity-lang.org")
 (define-constant TOKEN_NAME  "DeIns Mutual")
 (define-constant TOKEN_SYMBOL  "DIM")
@@ -55,7 +55,7 @@
 
 (define-constant BUFFER_CONSTANT 10) 
 (define-constant MCR_CONSTANT u5) 
-(define-constant REBALANCE_INTERVAL u0)
+(define-constant REBALANCE_INTERVAL u5)
 
 ;; private functions
 ;;
@@ -74,7 +74,7 @@
     (var-set liquidity_token (+ (var-get liquidity_token) (* amount (var-get price))))
     (try! (ft-mint? deins-mutual (* amount (var-get price)) tx-sender))
     (var-set latest_rebalance_time (+ (var-get latest_rebalance_time) u1))
-    (if (> (var-get latest_rebalance_time) u20) (update_internals) (ok true))
+    (if (> (var-get latest_rebalance_time) REBALANCE_INTERVAL) (update_internals) (ok true))
   )
 )
 
@@ -86,8 +86,8 @@
     (var-set liquidity (- (var-get liquidity) amount))
     (var-set liquidity_token (- (var-get liquidity_token) (* amount (var-get price))))
     (try! (ft-burn? deins-mutual (* amount (var-get price)) tx-sender))
-    (map-set returns tx-sender (+ (unwrap! (map-get? returns tx-sender) (err u2134)) amount))
-    (if (> (var-get latest_rebalance_time) u20) (update_internals) (ok true))
+    (map-set returns tx-sender (+ amount (default-to u0 (map-get? returns tx-sender))))
+    (if (> (var-get latest_rebalance_time) REBALANCE_INTERVAL) (update_internals) (ok true))
   )
 )
 
@@ -95,7 +95,7 @@
   (begin
   ;; TODO Check owner
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_NOT_TOKEN_OWNER)
-    (let ((amount (unwrap! (map-get? returns recipient) (err u2134)))) 
+    (let ((amount (unwrap! (map-get? returns recipient) (err u2135)))) 
       (asserts! (> amount u0) (err u3124))
       (try! (stx-transfer? amount CONTRACT_OWNER tx-sender))
     )

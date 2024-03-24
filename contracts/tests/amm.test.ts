@@ -83,14 +83,16 @@ describe("fund tests", () => {
     );
 
     // In microSTX
-    simnet.callPublicFn("amm", "burn", [Cl.uint(1000)], address1);
+    const resp2 = simnet.callPublicFn("amm", "burn", [Cl.uint(1000)], address1);
+    console.log(resp2);
 
-    simnet.callPublicFn(
+    const resp = simnet.callPublicFn(
       "amm",
       "redeem",
-      [Cl.uint(1000), Cl.principal(address1)],
+      [Cl.principal(address1)],
       deployer
     );
+    console.log(resp);
 
     liquidity = simnet.getDataVar("amm", "liquidity");
     expect(liquidity).toBeUint(9000);
@@ -113,12 +115,7 @@ describe("fund tests", () => {
     expect(liquidity).toBeUint(20000);
 
     simnet.callPublicFn("amm", "burn", [Cl.uint(10000)], address1);
-    simnet.callPublicFn(
-      "amm",
-      "redeem",
-      [Cl.uint(10000), Cl.principal(address1)],
-      deployer
-    );
+    simnet.callPublicFn("amm", "redeem", [Cl.principal(address1)], deployer);
 
     liquidity = simnet.getDataVar("amm", "liquidity");
     expect(liquidity).toBeUint(10000);
@@ -128,15 +125,34 @@ describe("fund tests", () => {
     let price = simnet.getDataVar("amm", "price");
 
     simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
-
     let newPrice = simnet.getDataVar("amm", "price");
+    expect(newPrice.value).toBe(price.value);
+
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
+    newPrice = simnet.getDataVar("amm", "price");
+    expect(newPrice.value).toBe(price.value);
+
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
+    newPrice = simnet.getDataVar("amm", "price");
+    expect(newPrice.value).toBe(price.value);
+
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
+    newPrice = simnet.getDataVar("amm", "price");
+    expect(newPrice.value).toBe(price.value);
+
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
+    newPrice = simnet.getDataVar("amm", "price");
+    expect(newPrice.value).toBe(price.value);
+
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
+    newPrice = simnet.getDataVar("amm", "price");
     expect(newPrice.value).toBeLessThan(price.value);
 
     simnet.callPublicFn("amm", "burn", [Cl.uint(10000)], address1);
     simnet.callPublicFn(
       "amm",
       "redeem",
-      [Cl.uint(10000), Cl.principal(address1)],
+      [Cl.principal(address1)],
       deployer
     );
 
