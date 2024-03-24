@@ -9,7 +9,8 @@ services:
     environment:
       VITE_CREW_HREF: http://localhost:3001
       VITE_BACKEND_BASE: http://localhost:4000
-      VITE_AMM_CONTRACT: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
+      VITE_AMM_CONTRACT: ST1PCFPA63HE8WKYC13RNFB0N2XJRER8BKG4XV1MA
+      VITE_COVER_CONTRACT: ST1PCFPA63HE8WKYC13RNFB0N2XJRER8BKG4XV1MA
     volumes:
       - "./frontend-insurance/src:/app/src"
       - "./frontend-insurance/public:/app/public"
