@@ -71,39 +71,37 @@ describe("cover", () => {
     );
     expect(cover).not.toBeNull();
 
-    simnet.callPublicFn("amm", "deposit", [Cl.uint(10000)], address1);
+    simnet.callPublicFn("amm", "mint", [Cl.uint(10000)], address1);
 
     const liquidity = simnet.getDataVar("amm", "liquidity");
     expect(liquidity).toBeUint(10000);
 
     let resp = simnet.callReadOnlyFn(
-      "token",
+      "amm",
       "get-balance",
       [Cl.principal(address1)],
       address1
     );
-    console.log(resp);
 
     simnet.callPublicFn(
       "cover",
       "stake_tokens",
-      [Cl.stringAscii("new_name"), Cl.uint(1000)],
+      [Cl.stringAscii("new_name"), Cl.uint(1000), Cl.uint(0)],
       address1
     );
     simnet.callPublicFn(
       "cover",
       "stake_tokens",
-      [Cl.stringAscii("new_name"), Cl.uint(1000)],
+      [Cl.stringAscii("new_name"), Cl.uint(1000), Cl.uint(0)],
       address1
     );
 
     resp = simnet.callReadOnlyFn(
-      "token",
+      "amm",
       "get-balance",
       [Cl.principal(address1)],
       address1
     );
-    console.log(resp);
 
     cover = simnet.callReadOnlyFn(
       "cover",
@@ -147,11 +145,71 @@ describe("cover", () => {
     resp = simnet.callReadOnlyFn(
       "cover",
       "get_cover_bought",
-      [Cl.stringAscii('new_name')],
+      [Cl.stringAscii("new_name")],
       address1
     );
 
     expect(resp.result.value.value.data.amount.value).toBe(10000n);
     expect(resp.result.value.value.data.duration_days.value).toBe(30n);
+  });
+
+  it("stake", () => {
+    simnet.callPublicFn(
+      "cover",
+      "create_cover",
+      [Cl.stringAscii("new_name"), Cl.uint(1)],
+      address1
+    );
+
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
+
+    simnet.callPublicFn(
+      "cover",
+      "stake_tokens",
+      [Cl.stringAscii("new_name"), Cl.uint(1000), Cl.uint(0)],
+      address1
+    );
+
+    let cover = simnet.callReadOnlyFn(
+      "cover",
+      "get_cover",
+      [Cl.stringAscii("new_name")],
+      address1
+    );
+    console.log(cover.result.value.value)
+
+    simnet.callPublicFn(
+      "cover",
+      "vote_start_vote",
+      [Cl.stringAscii('new_name')],
+      address1
+    );
+
+    cover = simnet.callReadOnlyFn(
+      "cover",
+      "get_cover",
+      [Cl.stringAscii("new_name")],
+      address1
+    );
+    console.log(cover.result.value.value)
+
+    simnet.callPublicFn(
+      "cover",
+      "vote_claim",
+      [Cl.stringAscii('new_name'), Cl.uint(1)],
+      address1
+    );
+
+    cover = simnet.callReadOnlyFn(
+      "cover",
+      "get_cover",
+      [Cl.stringAscii("new_name")],
+      address1
+    );
+    console.log(cover.result.value.value)
+
+
+
+
   });
 });
