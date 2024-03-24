@@ -9,6 +9,7 @@ services:
     environment:
       VITE_CREW_HREF: http://localhost:3001
       VITE_BACKEND_BASE: http://localhost:4000
+      VITE_AMM_CONTRACT: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
     volumes:
       - "./frontend-insurance/src:/app/src"
       - "./frontend-insurance/public:/app/public"
@@ -43,6 +44,19 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
     ports:
-      - "5432:5432"
+      - "5400:5432"
     volumes:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  agents-oracle:
+    build:
+      context: ./ai-agent-crew
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      USER_AGENT: ${USER_AGENT}
+      REDDIT_USERNAME: ${REDDIT_USERNAME}
+      REDDIT_PASSWORD: ${REDDIT_PASSWORD}
