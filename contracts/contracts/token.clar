@@ -12,18 +12,7 @@
 
 ;; token definitions
 ;;
-(define-fungible-token deins-mutual)
 
-;; constants
-;;
-(define-constant ERR_OWNER_ONLY  (err u100))
-(define-constant ERR_NOT_TOKEN_OWNER  (err u100))
-
-(define-constant CONTRACT_OWNER  (as-contract tx-sender))
-(define-constant TOKEN_URI u"https://clarity-lang.org")
-(define-constant TOKEN_NAME  "DeIns Mutual")
-(define-constant TOKEN_SYMBOL  "DIM")
-(define-constant TOKEN_DECIMALS  u6)
 
 ;; data vars
 ;;
@@ -47,8 +36,12 @@
 
 (define-public (mint (amount uint) (recipient principal)) 
   (begin 
-    ;; (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_OWNER_ONLY) 
-    (ft-mint? deins-mutual amount recipient)
+    (asserts! (is-eq tx-sender (as-contract .amm)) (err {
+      caller: tx-sender,
+      should_be: (as-contract .amm)
+    })) 
+    (ok true)
+    ;; (ft-mint? deins-mutual amount recipient)
   )
 )
 
