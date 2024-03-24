@@ -18,11 +18,6 @@ path = 'contracts/cover.clar'
 clarity_version = 2
 epoch = 2.4
 
-[contracts.token]
-path = 'contracts/token.clar'
-clarity_version = 2
-epoch = 2.4
-
 [repl]
 clarity_wasm_mode = false
 show_timings = false
