@@ -20,23 +20,16 @@ plan:
     - id: 1
       transactions:
         - contract-publish:
-            contract-name: token
-            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 16450
-            path: contracts/token.clar
-            anchor-block-only: true
-            clarity-version: 2
-        - contract-publish:
             contract-name: amm
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 32470
+            cost: 44550
             path: contracts/amm.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: cover
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 8190
+            cost: 74740
             path: contracts/cover.clar
             anchor-block-only: true
             clarity-version: 2

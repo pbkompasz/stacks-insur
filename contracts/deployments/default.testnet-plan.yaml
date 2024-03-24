@@ -10,9 +10,9 @@ plan:
       transactions:
         - requirement-publish:
             contract-id: SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard
-            remap-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
+            remap-sender: ST1PCFPA63HE8WKYC13RNFB0N2XJRER8BKG4XV1MA
             remap-principals:
-              SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
+              SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE: ST1PCFPA63HE8WKYC13RNFB0N2XJRER8BKG4XV1MA
             cost: 8400
             path: "./.cache/requirements/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.clar"
             clarity-version: 1
@@ -20,23 +20,16 @@ plan:
     - id: 1
       transactions:
         - contract-publish:
-            contract-name: token
-            expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
-            cost: 18500
-            path: contracts/token.clar
-            anchor-block-only: true
-            clarity-version: 2
-        - contract-publish:
             contract-name: amm
-            expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
-            cost: 27650
+            expected-sender: ST1PCFPA63HE8WKYC13RNFB0N2XJRER8BKG4XV1MA
+            cost: 3020307738
             path: contracts/amm.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: cover
-            expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
-            cost: 35090
+            expected-sender: ST1PCFPA63HE8WKYC13RNFB0N2XJRER8BKG4XV1MA
+            cost: 3022341616
             path: contracts/cover.clar
             anchor-block-only: true
             clarity-version: 2
