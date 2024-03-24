@@ -12,14 +12,21 @@ import Grid from "@mui/material/Grid/Grid";
 import TextField from "@mui/material/TextField/TextField";
 import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
+import { convertPrice } from "../../../util/price";
+import { useLocalStorage } from "../../../util/useLocalStorage";
+import { fetchCoverEstimate } from "../../../util/hiro";
 
 const steps = ["Details", "Quote", "Verify Identity"];
 
 const BuySmartContractCover = ({ cover }: { cover: Cover }) => {
+  console.log(cover);
   const [activeStep, setActiveStep] = useState(0);
+  const [acceptanceTime, setAcceptanceTime] = useLocalStorage("acceptanceTime");
+  const [cart, setCart] = useLocalStorage("cart");
 
   const handleNext = () => {
     if (activeStep === 0) {
+      setAcceptanceTime(undefined);
       calculateCost();
       const today = new Date();
       setCalculatedCalculatedExpiryDate(
@@ -27,7 +34,22 @@ const BuySmartContractCover = ({ cover }: { cover: Cover }) => {
       );
     }
     if (activeStep === 1) {
-      setAcceptanceTime(new Date());
+      const twentyMinutesLater = new Date();
+      twentyMinutesLater.setMinutes(twentyMinutesLater.getMinutes() + 20);
+      setAcceptanceTime(String(twentyMinutesLater));
+    }
+    if (activeStep === steps.length - 1) {
+      const newCart = cart ? JSON.parse(cart) : [];
+      newCart.push({
+        name: cover.name,
+        type: cover.cover_type,
+        acceptanceTime,
+        coveredAssetId,
+        coveredDuration,
+        coveredAmount,
+        calculatedCost,
+      });
+      setCart(JSON.stringify(newCart));
     }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -50,13 +72,30 @@ const BuySmartContractCover = ({ cover }: { cover: Cover }) => {
   }, [coveredAssetId, coveredAmount, coveredDuration]);
 
   const [calculatedCost, setCalculatedCost] = useState(0);
+  const [convertedCost, setConvertedCost] = useState(0);
   const [calculatedExpiryDate, setCalculatedCalculatedExpiryDate] = useState(
     new Date()
   );
-  const [acceptanceTime, setAcceptanceTime] = useState(new Date());
+
   const calculateCost = () => {
-    setCalculatedCost(coveredAmount / 1000);
+    // get-cover-estimate_
+    fetchCoverEstimate(cover.name, coveredAmount).then((amount) => {
+      setCalculatedCost(amount);
+    });
   };
+
+  useEffect(() => {
+    const convert = async () => {
+      try {
+        const valueInUsd = await convertPrice(+calculatedCost, "STX", "USD");
+        setConvertedCost(+valueInUsd.toFixed(2));
+      } catch (error) {
+        console.log("Error fetching value");
+        return 0;
+      }
+    };
+    convert().catch(console.error);
+  }, [calculatedCost]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -160,9 +199,14 @@ const BuySmartContractCover = ({ cover }: { cover: Cover }) => {
               <Typography variant="h4" style={{ fontSize: "20px" }}>
                 Cost of Cover
               </Typography>
-              <Typography style={{ fontWeight: "600" }}>
-                {calculatedCost} STX
-              </Typography>
+              <Stack direction="row">
+                <Typography style={{ fontWeight: "600" }}>
+                  {calculatedCost} STX
+                </Typography>
+                <Typography style={{ fontWeight: "600" }}>
+                  ($ {convertedCost})
+                </Typography>
+              </Stack>
             </Paper>
             <Paper style={{ padding: "1rem" }} variant="outlined">
               <Typography variant="h4" style={{ fontSize: "20px" }}>
@@ -253,11 +297,13 @@ const BuySmartContractCover = ({ cover }: { cover: Cover }) => {
       {activeStep === steps.length && (
         <Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed, the coverage with accepted quote has been placed into your basket.
+            All steps completed, the coverage with accepted quote has been
+            placed into your basket.
             <br />
-            You have 20 minutes to make the payment.  
+            You have 20 minutes to make the payment.
             <br />
-            Click <Link href="/dashboard/checkout">here</Link> to go to the checkout page.
+            Click <Link href="/dashboard/checkout">here</Link> to go to the
+            checkout page.
           </Typography>
         </Fragment>
       )}
