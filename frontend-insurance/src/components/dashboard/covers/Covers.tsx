@@ -13,6 +13,11 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Link from "@mui/material/Link/Link";
 
+type Cover = {
+  name: string,
+  id: string,
+}
+
 type CoverOption = "smart-contract" | "de-peg";
 
 const Covers = () => {
@@ -57,14 +62,14 @@ const Covers = () => {
                   of X as cover fee.
                 </li>
                 <li>
-                  A risk assessor gives a fair assessment by staking TOKEN_NAME.
+                  A risk assessor gives a fair assessment by staking DIM.
                   For this they receive a part of the cover fee and their
-                  TOKEN_NAME get returned.
+                  DIM get returned.
                 </li>
                 <li>
-                  In case loss event a stake assessor stakes TOKEN_NAME which
+                  In case loss event a stake assessor stakes DIM which
                   will constitute the capital pool from which the coverage would
-                  be payed. For this they receive their TOKEN_NAME and a bonus.
+                  be payed. For this they receive their DIM and a bonus.
                 </li>
               </ol>
             </Paper>
@@ -132,3 +137,7 @@ const Covers = () => {
 };
 
 export default Covers;
+
+export {
+  type Cover,
+}
