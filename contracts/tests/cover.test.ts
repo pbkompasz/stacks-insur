@@ -133,6 +133,7 @@ describe("cover", () => {
   });
 
   it("buy cover", () => {
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
     simnet.callPublicFn(
       "cover",
       "create-cover",
@@ -145,6 +146,7 @@ describe("cover", () => {
       [Cl.stringAscii("new_name"), Cl.uint(10000), Cl.uint(30)],
       address1
     );
+    console.log(resp)
 
     resp = simnet.callReadOnlyFn(
       "cover",
@@ -219,6 +221,7 @@ describe("cover", () => {
 
 
   it("test default cover", () => {
+    simnet.callPublicFn("amm", "mint", [Cl.uint(20000)], address1);
     let cover = simnet.callReadOnlyFn(
       "cover",
       "get-cover",
@@ -241,6 +244,7 @@ describe("cover", () => {
       [Cl.stringAscii("USDT - Tether USDt")],
       address1
     );
+    console.log(resp.result)
 
 
     expect(resp.result.value.value.data.amount.value).toBe(10000n);

@@ -182,8 +182,7 @@
     (asserts! (> duration_days u10) ERR_DAYS)
     (asserts! (not (is-none (map-get? covers cover_name))) ERR_NO_COVER)
     (let ((estimate (unwrap! (get-cover-estimate cover_name amount) (err u21432)))) 
-      ;; TODO
-      ;; (asserts! (> (unwrap! (contract-call? .token get-balance tx-sender) (err u1234)) amount) (err u432))
+      (asserts! (> (unwrap! (contract-call? .amm get-balance tx-sender) (err u1234)) amount) (err u432))
       (try! (stx-transfer? estimate tx-sender (as-contract tx-sender)))
     )
     (map-set covers_bought
@@ -207,11 +206,12 @@
 )
 
 (define-read-only (get-cover-bought (name (string-ascii 32)))
-    (ok
-      (map-get? covers_bought {
-        buyer: tx-sender,
-        cover_name: name,
-      }))
+  (ok 
+    (map-get? covers_bought {
+      buyer: tx-sender,
+      cover_name: name,
+    })
+  )
 )
 
 (define-read-only (get-claims-active) (ok true))
@@ -274,8 +274,7 @@
 (define-private (buy-cover-test (cover_name (string-ascii 32)) (amount uint) (duration_days uint)) 
   (begin 
     (let ((estimate (unwrap! (get-cover-estimate cover_name amount) (err u21432)))) 
-      ;; TODO
-      ;; (asserts! (> (unwrap! (contract-call? .token get-balance tx-sender) (err u1234)) amount) (err u432))
+      (asserts! (> (unwrap! (contract-call? .amm get-balance tx-sender) (err u1234)) amount) (err u432))
       ;; (ok estimate)
       (try! (stx-transfer? estimate tx-sender (as-contract tx-sender)))
     )

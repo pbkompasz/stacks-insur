@@ -93,7 +93,6 @@
 
 (define-public (redeem (recipient principal))
   (begin
-  ;; TODO Check owner
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_NOT_TOKEN_OWNER)
     (let ((amount (unwrap! (map-get? returns recipient) (err u2135)))) 
       (asserts! (> amount u0) (err u3124))
