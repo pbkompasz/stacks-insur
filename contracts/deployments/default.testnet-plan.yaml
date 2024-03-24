@@ -22,21 +22,21 @@ plan:
         - contract-publish:
             contract-name: token
             expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
-            cost: 491298
+            cost: 18500
             path: contracts/token.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: amm
             expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
-            cost: 491539
+            cost: 27650
             path: contracts/amm.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: cover
             expected-sender: ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT
-            cost: 491178
+            cost: 35090
             path: contracts/cover.clar
             anchor-block-only: true
             clarity-version: 2
