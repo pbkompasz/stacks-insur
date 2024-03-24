@@ -6,25 +6,32 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import FormControl from "@mui/material/FormControl";
+import { fetchPrice } from "../../util/hiro";
 // import BigNum from "bn.js";
 
 const Exchange = () => {
   const [success, setSuccess] = useState();
+  const [tokenPrice, setTokenPrice] = useState(-1);
+
+  useEffect(() => {
+    fetchPrice().then((price) => {
+      setTokenPrice(price);
+    });
+  }, []);
 
   const send = async () => {
     const functionArgs = [uintCV(originAmount * 1000000)];
 
     const options = {
-      // contractAddress: import.meta.env.VITE_AMM_CONTRACT,
-      contractAddress: "ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT",
+      contractAddress: import.meta.env.VITE_AMM_CONTRACT,
       contractName: "amm",
-      functionName: originToken === "STX" ? "deposit" : "redeem",
+      functionName: originToken === "STX" ? "mint" : "burn",
       functionArgs,
       network: new StacksTestnet(),
       appDetails: {
@@ -50,13 +57,12 @@ const Exchange = () => {
 
   const updateAmount = (val: string) => {
     setOriginAmount(+val);
-    setTargetAmount(1234);
+    setTargetAmount(
+      originToken === "STX" ? (+val * tokenPrice) : (+val / tokenPrice)
+    );
   };
 
-  const updateToken = (
-    which: "origin" | "target",
-    val: "STX" | "DIM"
-  ) => {
+  const updateToken = (which: "origin" | "target", val: "STX" | "DIM") => {
     const otherToken = val === "STX" ? "DIM" : "STX";
     setOriginToken(which === "origin" ? val : otherToken);
     setTargetToken(which === "origin" ? otherToken : val);
@@ -74,7 +80,7 @@ const Exchange = () => {
         style={{ width: "600px", margin: "2rem auto", padding: "2rem" }}
       >
         <Stack alignItems="stretch" gap={2}>
-          <Typography>1 STX = {"tokenPrice"} DIM</Typography>
+          <Typography>1 STX = {tokenPrice} DIM</Typography>
           <Stack direction="row" justifyContent="space-between" gap={2}>
             <TextField
               id="outlined-number"
