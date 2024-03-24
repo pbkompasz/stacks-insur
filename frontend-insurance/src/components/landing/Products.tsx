@@ -1,7 +1,8 @@
 
 const Products = () => {
   return (
-    <>You had products???</>
+    <>
+    </>
   )
 }
 
