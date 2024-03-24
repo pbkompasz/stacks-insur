@@ -63,7 +63,6 @@
 ;;
 
 (define-public (create-cover (name (string-ascii 32)) (cover_type uint))
-  ;; TODO Check not created
   (begin 
     (asserts! (or (is-eq cover_type u0) (is-eq cover_type u1)) ERR_WRONG_COVER_TYPE)
     (asserts! (is-none (map-get? covers name)) ERR_COVER_EXISTS)
@@ -217,12 +216,34 @@
 
 (define-read-only (get-claims-active) (ok true))
 
+
 ;; private functions
 ;;
-;; TODO
-(define-private (payout-claims) 
+
+(define-private (payout-claim (cover_name (string-ascii 32)) (buyer principal)) 
   (begin
+    (asserts! (not (is-none (map-get? covers cover_name))) ERR_NO_COVER)
+    (asserts! (not (is-none (map-get? covers_bought {
+      buyer: tx-sender,
+      cover_name: cover_name,
+    }))) ERR_NO_COVER)
+    (try! (stx-transfer? (get amount (unwrap! (map-get? covers_bought {
+      buyer: tx-sender,
+      cover_name: cover_name,
+    }) (err u1234))) tx-sender buyer))
     (ok true)  
+  )
+)
+
+(define-private (return-stakes (cover_name (string-ascii 32)) (staker principal) (amount uint))
+  (begin 
+    (let ((total_amount (get amount (unwrap! (map-get? tokens_staked {
+      cover_name: cover_name,
+      staker: staker
+    }) (err u1234))))) 
+      (asserts! (> total_amount amount) (err u12345))
+      (stx-transfer? amount tx-sender staker)
+    )
   )
 )
 
