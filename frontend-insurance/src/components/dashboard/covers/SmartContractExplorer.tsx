@@ -7,6 +7,7 @@ import Explorer from "../../reusable/Explorer.tsx";
 import BuySmartContractCover from "./BuySmartContractCover.tsx";
 import { fetchCovers } from "../../../util/backend.ts";
 import type { Cover } from "./Covers.tsx";
+import { fetchCover } from "../../../util/hiro.ts";
 
 const SmartContractExplorer = () => {
   const [open, setOpen] = useState(false);
@@ -25,8 +26,22 @@ const SmartContractExplorer = () => {
 
   useEffect(() => {
     fetchCovers()
-      .then((covers) => {
-        setCovers(covers);
+      .then(async (covers) => {
+        const newCovers = await Promise.all(
+          covers.map(async (cover: Cover) => {
+            const data = await fetchCover(cover.name);
+            return {
+              ...cover,
+              fromChain: {
+                riskRating: parseInt(data?.risk_factor?.value ?? 0),
+                riskAssessors: parseInt(data?.stakers_risk?.value ?? 0),
+                buyers: parseInt(data?.buyers?.value ?? 0),
+                claimRequests: parseInt(data?.start_vote?.value ?? 0),
+              },
+            };
+          })
+        );
+        setCovers(newCovers);
       })
       .catch((e) => {
         setError(e.message);
