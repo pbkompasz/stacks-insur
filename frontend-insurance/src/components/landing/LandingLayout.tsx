@@ -16,14 +16,14 @@ const LandingLayout = () => {
         sx={{ borderBottom: 1, borderColor: "primary.main" }}
       >
         <Link href="/">Home</Link>
-        <Link href="/products">Products</Link>
+        {/* <Link href="/products">Products</Link> */}
         <Link href="/how-it-works">How it works</Link>
         <Button
           variant="outlined"
           style={{ marginLeft: "auto" }}
           href="/dashboard/buy"
         >
-          Get covered
+          Dashboard
         </Button>
       </Stack>
       <Outlet />
