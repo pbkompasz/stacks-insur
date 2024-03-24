@@ -47,6 +47,7 @@ const Checkout = () => {
       const dif = t1.getTime() - t2.getTime();
 
       setRemainingTime(Math.round(dif / 1000));
+      setIsOver(false);
     }
 
     if (!isOver) {
@@ -63,17 +64,18 @@ const Checkout = () => {
   }, [isOver]);
 
   const pay = async () => {
+    let c  =(cart ? JSON.parse(cart) : [])[0];
+    console.log(c)
     const functionArgs = [
-      stringAsciiCV((cart ? JSON.parse(cart) : [])[0].name),
-      uintCV(totalAmount),
-      uintCV((cart ? JSON.parse(cart) : [])[0].duration), 
+      stringAsciiCV(c.name),
+      uintCV(c.calculatedCost * 100000),
+      uintCV(c.coveredDuration), 
     ];
 
     const options = {
-      // contractAddress: import.meta.env.VITE_AMM_CONTRACT,
-      contractAddress: "ST2FJ1YXQ54HQZ3TXAXM1M1W6DJKQ338XT0T893FT",
-      contractName: "amm",
-      functionName: "buy_cover",
+      contractAddress: import.meta.env.VITE_AMM_CONTRACT,
+      contractName: "cover",
+      functionName: "buy-cover",
       functionArgs,
       network: new StacksTestnet(),
       appDetails: {
@@ -114,7 +116,7 @@ const Checkout = () => {
               fullWidth
               variant="contained"
               size="large"
-              disabled={isOver || (!acceptanceTime && remainingTime <= 0)}
+              disabled={isOver || (!acceptanceTime && remainingTime <= 0) || !totalAmount}
               onClick={pay}
             >
               Pay
@@ -124,7 +126,7 @@ const Checkout = () => {
         <Grid item padding={2} sm={5} style={{ borderLeft: "1px solid" }}>
           <Stack gap={1}>
             {(cart ? JSON.parse(cart) : []).map((item: CartItem) => (
-              <Stack direction="row" justifyContent="space-between">
+              <Stack direction="row" key={item.name} justifyContent="space-between">
                 <Stack style={{ textAlign: "left" }}>
                   <Typography style={{ fontSize: "20px", fontWeight: "600" }}>
                     {item.type} {item.name ?? "Insurance"}
