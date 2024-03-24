@@ -1,19 +1,9 @@
-
 ;; title: cover
 ;; version: 0.1
 ;; summary: Manage covers
 ;; description: Create, update, stake tokens, vote and claim covers
+;; todo: Add security
 
-;; NOTE use at-block to check covers instead of storing them in a map ?maybe?
-
-;; traits
-;;
-
-;; token definitions
-;;
-
-;; constants
-;;
 ;; Owner
 (define-constant contract-owner tx-sender)
 
@@ -36,6 +26,17 @@
   }
 )
 
+(define-map tokens_staked
+  {
+    staker: principal,
+    cover_name: (string-ascii 32)
+  } {
+    amount: uint,
+  }
+)
+
+
+
 ;; data vars
 ;;
 
@@ -47,27 +48,28 @@
 (define-map covers (string-ascii 32) {
   amount: uint,
   type: uint,
-  stakers: uint,
+  stakers_cover: uint,
+  stakers_risk: uint,
   ;; 1 - 100
   risk_factor: uint,
+  start_vote: uint,
+  yes_votes: uint,
 })
 
 ;; public functions
 ;;
 
 (define-public (create_cover (name (string-ascii 32)) (cover_type uint))
-  ;; (begin 
   ;; TODO Check not created
-    (ok (map-set covers name {
-      amount: u0,
-      type: cover_type,
-      stakers: u0,
-      risk_factor: u10,
-    }))
-    ;; (ok true)
-    ;; (ok (map-set names-map { name: "blockstack" } { id: 1337 }))
-    ;; (ok (map-get? covers { name: new_name}))
-  ;; )
+  (ok (map-set covers name {
+    amount: u0,
+    type: cover_type,
+    stakers_cover: u0,
+    stakers_risk: u0,
+    risk_factor: u10,
+    start_vote: u0,
+    yes_votes: u0,
+  }))
 )
 
 (define-public (update_cover (name (string-ascii 32)) (amount uint)) 
@@ -75,31 +77,86 @@
     (map-set covers name {
       amount: amount,
       type: (get type (unwrap! (map-get? covers name) (err u1234))),
-      stakers: (get stakers (unwrap! (map-get? covers name) (err u1234))),
+      stakers_cover: (get stakers_cover (unwrap! (map-get? covers name) (err u1234))),
+      stakers_risk: (get stakers_risk (unwrap! (map-get? covers name) (err u1234))),
       risk_factor: u10,
+      start_vote: u0,
+      yes_votes: u0,
     }) 
     (ok true)
   )
 )
 
 ;; NOTE Tokens are MIN Type
-(define-public (stake_tokens (cover_name (string-ascii 32)) (token_amount uint)) 
+;; u0 - Risk, u1 - Cover
+(define-public (stake_tokens (cover_name (string-ascii 32)) (token_amount uint) (stake_type uint)) 
   (begin
-    (unwrap! (contract-call? .token get-balance tx-sender) (err u1234))
+    (unwrap! (contract-call? .amm get-balance tx-sender) (err u1234))
     (map-set covers cover_name {
       amount: (+ token_amount (get amount (unwrap! (map-get? covers cover_name) (err u1234)))),
       type: (get type (unwrap! (map-get? covers cover_name) (err u1234))),
-      stakers: (+ u1 (get stakers (unwrap! (map-get? covers cover_name) (err u1234)))),
+      stakers_cover: (+ u1 (get stakers_cover (unwrap! (map-get? covers cover_name) (err u1234)))),
+      stakers_risk: (+ u1 (get stakers_risk (unwrap! (map-get? covers cover_name) (err u1234)))),
       risk_factor: u10,
+      start_vote: u0,
+      yes_votes: u0,
+    }) 
+
+    (map-set tokens_staked {
+      staker: tx-sender,
+      cover_name: cover_name,
+    } {
+      amount: token_amount
     }) 
     (ok true)
   )
 )
 
 ;; vote
-(define-public (vote_claim_validity (cover_name (string-ascii 32)))
-  (ok true)
+;; u1 - yes, u0 - no
+(define-public (vote_claim (cover_name (string-ascii 32)) (vote uint))
+  (begin
+    (unwrap! (map-get? tokens_staked {
+      staker: tx-sender,
+      cover_name: cover_name,
+    }) (err u1234))
+    (asserts! (> (get start_vote (unwrap! (map-get? covers cover_name) (err u1234)))
+      (/ (get stakers_risk (unwrap! (map-get? covers cover_name) (err u1234))) u2)
+    ) (err u12432))
+     (map-set covers cover_name {
+      amount: (get amount (unwrap! (map-get? covers cover_name) (err u1234))),
+      type: (get type (unwrap! (map-get? covers cover_name) (err u1234))),
+      stakers_risk: (+ u1 (get stakers_risk (unwrap! (map-get? covers cover_name) (err u1234)))),
+      stakers_cover: (get stakers_cover (unwrap! (map-get? covers cover_name) (err u1234))),
+      risk_factor: u10,
+      start_vote: (get start_vote (unwrap! (map-get? covers cover_name) (err u1234))),
+      yes_votes: (+ vote (get start_vote (unwrap! (map-get? covers cover_name) (err u1234)))),
+    })
+    (ok true)
+  )
 )
+
+;; A vote to start a vote to start a vote ...
+(define-public (vote_start_vote (cover_name (string-ascii 32)))
+  (begin
+    (unwrap! (map-get? tokens_staked {
+      staker: tx-sender,
+      cover_name: cover_name,
+    }) (err u1234))
+    (map-set covers cover_name {
+      amount: (get amount (unwrap! (map-get? covers cover_name) (err u1234))),
+      type: (get type (unwrap! (map-get? covers cover_name) (err u1234))),
+      stakers_risk: (get stakers_risk (unwrap! (map-get? covers cover_name) (err u1234))),
+      stakers_cover: (get stakers_cover (unwrap! (map-get? covers cover_name) (err u1234))),
+      risk_factor: u10,
+      start_vote: (+ u1 (get start_vote (unwrap! (map-get? covers cover_name) (err u1234)))),
+      yes_votes: u0,
+    })
+    (ok true)
+  )
+)
+
+
 
 (define-public (get_cover_estimate (cover_name (string-ascii 32)) (amount uint))
   (ok (/ (* amount (get risk_factor (unwrap! (map-get? covers cover_name) (err u1234)))) u100))  
@@ -130,7 +187,7 @@
 ;; read only functions
 ;;
 (define-read-only (get_cover (name (string-ascii 32)))
-    (ok (map-get? covers "new_name"))
+    (ok (map-get? covers name))
 )
 
 (define-read-only (get_cover_bought (name (string-ascii 32)))
@@ -141,12 +198,13 @@
       }))
 )
 
+;; (define-read-only (get_claims_active) ())
 
 
 ;; private functions
 ;;
 ;; TODO
-(define-private (pay_claims) 
+(define-private (payout_claims) 
   (begin
     (ok true)  
   )
