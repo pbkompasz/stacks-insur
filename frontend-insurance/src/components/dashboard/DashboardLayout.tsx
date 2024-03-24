@@ -32,6 +32,7 @@ import { showConnect } from "@stacks/connect";
 
 import { userSession } from "../../util/stacksInit.ts";
 import "../../App.scss";
+import { fetchBalance } from "../../util/hiro.ts";
 
 const drawerWidth = 240;
 
@@ -109,6 +110,8 @@ export default function MiniDrawer() {
   const [open, setOpen] = useState(false);
   const [network, setNetwork] = useState("Testnet");
   const [userData, setUserData] = useState({});
+  const [stxBalance, setStxBalance] = useState(0);
+  const [dimBalance, setDimBalance] = useState(0);
 
   const toggleNetwork = () => {
     setNetwork(network === "Testnet" ? "Mainnet" : "Testnet");
@@ -127,11 +130,14 @@ export default function MiniDrawer() {
       setUserData(userSession.loadUserData());
       console.log(userSession.loadUserData());
     }
+    fetchBalance().then((b) => setStxBalance(b));
+    fetchBalance("DIM").then((b) => setDimBalance(b));
   }, []);
 
   const myAppName = "My Stacks Web-App";
   const myAppIcon = window.location.origin + "/my_logo.png";
 
+  const [isConnected, setIsConnected] = useState(userSession.isUserSignedIn());
   const connect = () => {
     showConnect({
       userSession,
@@ -141,12 +147,18 @@ export default function MiniDrawer() {
       },
       onFinish: (resp) => {
         console.log(resp);
+        setIsConnected(true);
       },
       onCancel: () => {
         console.log("cancelled");
       },
     });
   };
+
+  const disconnect = () => {
+    userSession.signUserOut()
+    setIsConnected(false);
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -172,7 +184,7 @@ export default function MiniDrawer() {
           >
             <ShoppingCartIcon></ShoppingCartIcon>
           </Link>
-          {!userSession.isUserSignedIn() ? (
+          {!isConnected ? (
             <Button
               variant="outlined"
               color="secondary"
@@ -185,7 +197,7 @@ export default function MiniDrawer() {
               <Button
                 color="secondary"
                 variant="outlined"
-                onClick={() => userSession.signUserOut()}
+                onClick={() => disconnect()}
               >
                 Disconnect
               </Button>
@@ -286,6 +298,7 @@ export default function MiniDrawer() {
               padding: "1rem",
             }}
           >
+            Balance: {stxBalance.toFixed(2)} STX / {dimBalance.toFixed(2)} DIM
             <div
               style={{
                 maxWidth: "240px",
