@@ -2,7 +2,7 @@
 
 ## Description
 
-DeIns Mutual is a decentralized mutual insurance-like product. Our aim is to provide permissionless discretionary cover for on-chain and off-chain(maybe) entities.  
+DeIns Mutual is a decentralized mutual insurance-like product. Our goal is to offer permissionless insurance coverage for on-chain events on with settlements on Bitcoin.
 Given that Bitcoin is becoming the standard for settlements it becomes a great platform to manage insurance.  
 
 ## How it works
